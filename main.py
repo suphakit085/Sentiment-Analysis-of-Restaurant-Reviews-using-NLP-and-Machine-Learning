@@ -42,6 +42,8 @@ from src.visualization  import (
     plot_sentiment_distribution,
     plot_model_comparison,
     plot_all_confusion_matrices,
+    plot_wordclouds,
+    plot_per_class_f1,
 )
 
 
@@ -108,6 +110,14 @@ def main():
     cmp_path = plot_model_comparison(comparison_df)
     print(f"  Model comparison chart → {cmp_path}")
     plot_all_confusion_matrices(results)
+
+    # Word cloud for each sentiment class
+    wc_path = plot_wordclouds(df)
+    print(f"  Word clouds          → {wc_path}")
+
+    # Per-class F1 breakdown
+    f1_path = plot_per_class_f1(results)
+    print(f"  Per-class F1 chart   → {f1_path}")
 
     # ── Step 9: Final Summary ─────────────────────────────────────────────────
     elapsed = time.time() - start_time
