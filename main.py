@@ -19,10 +19,12 @@ if sys.stdout.encoding != "utf-8":
 warnings.filterwarnings("ignore")
 
 # ─── Paths ─────────────────────────────────────────────────────────────────────
-BASE_DIR  = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(BASE_DIR, "data", "raw", "yelp_sentiment_master_dataset.csv")
-OUT_DIR   = os.path.join(BASE_DIR, "outputs")
+BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH  = os.path.join(BASE_DIR, "data", "raw", "yelp_sentiment_master_dataset.csv")
+OUT_DIR    = os.path.join(BASE_DIR, "outputs")
+MODELS_DIR = os.path.join(BASE_DIR, "models")
 os.makedirs(OUT_DIR, exist_ok=True)
+os.makedirs(MODELS_DIR, exist_ok=True)
 
 # Add src to Python path
 sys.path.insert(0, os.path.join(BASE_DIR, "src"))
@@ -36,15 +38,16 @@ from src.feature_extraction import (
     fit_transform_train,
     transform_test,
 )
-from src.models         import train_all_models
+from src.models         import train_all_models, save_model
 from src.evaluation     import evaluate_all_models
-from src.visualization  import (
+from src.visualization     import (
     plot_sentiment_distribution,
     plot_model_comparison,
     plot_all_confusion_matrices,
     plot_wordclouds,
     plot_per_class_f1,
 )
+from src.feature_extraction import save_vectorizer
 
 
 def print_header(title: str):
@@ -96,6 +99,13 @@ def main():
     # ── Step 6: Train Models ──────────────────────────────────────────────────
     print_header("Step 6: Train ML Models")
     models = train_all_models(X_train_tfidf, y_train)
+
+    # Save best model (Logistic Regression) and vectorizer for the web app
+    save_model(models["Logistic Regression"],
+               os.path.join(MODELS_DIR, "logistic_regression.joblib"))
+    save_vectorizer(vectorizer,
+                    os.path.join(MODELS_DIR, "tfidf_vectorizer.joblib"))
+    print("  [Saved] Model artifacts ready for Streamlit app.")
 
     # ── Step 7: Evaluate Models ───────────────────────────────────────────────
     print_header("Step 7: Model Evaluation")
